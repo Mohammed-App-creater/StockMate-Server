@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg
+alembic
+pydantic-settings
+python-jose[cryptography]
+# bcrypt is used directly (see app/core/security.py); passlib was dropped
+# because passlib 1.7.4's backend self-test breaks on modern bcrypt.
+bcrypt==4.0.1
+python-dotenv
+boto3

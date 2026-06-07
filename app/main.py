@@ -13,6 +13,16 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
+    # Expo Go on real devices sends a per-device LAN origin (exp:// or http://
+    # with a different IP each time), so match those by pattern alongside any
+    # Vercel/Render deployment.
+    allow_origin_regex=(
+        r"https://.*\.vercel\.app|"
+        r"https://.*\.onrender\.com|"
+        r"exp://.*|"
+        r"http://192\.168\..*|"
+        r"http://10\..*"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

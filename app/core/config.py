@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -35,13 +37,24 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def fix_db_url(cls, v: str) -> str:
-        # Render/Neon often hand out a sync scheme; coerce it to asyncpg so the
-        # async engine (and async alembic migrations) get a compatible driver.
+        # Fix scheme — Render/Neon hand out a sync scheme; coerce to asyncpg so
+        # the async engine (and async alembic migrations) get a compatible driver.
         if v.startswith("postgres://"):
             v = v.replace("postgres://", "postgresql+asyncpg://", 1)
-        if v.startswith("postgresql://"):
+        elif v.startswith("postgresql://"):
             v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return v
+
+        # Remove params asyncpg doesn't support (these are libpq/psycopg-only).
+        parsed = urlparse(v)
+        params = parse_qs(parsed.query)
+        params.pop("channel_binding", None)
+        params.pop("sslmode", None)
+
+        # Ensure ssl=require (asyncpg's spelling for an encrypted connection).
+        params["ssl"] = ["require"]
+
+        clean = parsed._replace(query=urlencode(params, doseq=True))
+        return urlunparse(clean)
 
 
 settings = Settings()

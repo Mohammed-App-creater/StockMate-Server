@@ -22,8 +22,12 @@ class Settings(BaseSettings):
 
     # CORS — origins allowed to call the API from a browser
     ALLOWED_ORIGINS: list[str] = [
+        "https://stock-mate-web.vercel.app",
         "http://localhost:3000",
         "http://localhost:8081",
+        "http://localhost:8082",
+        "exp://localhost:8081",
+        "exp://localhost:8082",
     ]
 
     # Cloudflare R2 object storage

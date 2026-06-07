@@ -50,8 +50,11 @@ class Settings(BaseSettings):
         params.pop("channel_binding", None)
         params.pop("sslmode", None)
 
-        # Ensure ssl=require (asyncpg's spelling for an encrypted connection).
-        params["ssl"] = ["require"]
+        # Require SSL for remote DBs (Render/Neon); local Postgres has no SSL.
+        if parsed.hostname not in ("localhost", "127.0.0.1"):
+            params["ssl"] = ["require"]
+        else:
+            params.pop("ssl", None)
 
         clean = parsed._replace(query=urlencode(params, doseq=True))
         return urlunparse(clean)

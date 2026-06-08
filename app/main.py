@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
 from app.routers import analytics, auth, products, transactions
 
 app = FastAPI(
@@ -12,17 +11,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
-    # Expo Go on real devices sends a per-device LAN origin (exp:// or http://
-    # with a different IP each time), so match those by pattern alongside any
-    # Vercel/Render deployment.
-    allow_origin_regex=(
-        r"https://.*\.vercel\.app|"
-        r"https://.*\.onrender\.com|"
-        r"exp://.*|"
-        r"http://192\.168\..*|"
-        r"http://10\..*"
-    ),
+    # Open to all origins, methods, and headers (no restriction).
+    # allow_origin_regex=".*" reflects whatever Origin is sent, which keeps CORS
+    # working even with allow_credentials=True — a literal allow_origins=["*"]
+    # is rejected by browsers on credentialed requests.
+    allow_origin_regex=".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

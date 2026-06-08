@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import analytics, auth, products, transactions
+from app.routers import analytics, auth, products, transactions, users
 
 app = FastAPI(
     title="StockMate API",
@@ -25,6 +25,7 @@ app.add_middleware(
 # The auth router already declares prefix="/auth", so include it without an
 # additional prefix to avoid producing "/auth/auth/...".
 app.include_router(auth.router)
+app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(products.router, prefix="/products", tags=["products"])
 app.include_router(
     transactions.router, prefix="/transactions", tags=["transactions"]
